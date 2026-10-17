@@ -29,13 +29,54 @@ header p {
   color: #a1a1aa;
 }
 
+/* 검색 바 스타일 */
+.search-container {
+  max-width: 1200px;
+  margin: 1.2rem auto 0;
+  padding: 0 1rem;
+}
+
+.search-box {
+  display: flex;
+  gap: 0.8rem;
+  background: #18181b;
+  border: 1px solid #27272a;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+}
+
+#search-input {
+  flex: 1;
+  background: #09090b;
+  border: 1px solid #3f3f46;
+  color: #f4f4f5;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+#search-btn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#search-btn:hover {
+  background: #1d4ed8;
+}
+
 /* 2열 분할 워크스페이스 레이아웃 */
 .workspace-container {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
   max-width: 1200px;
-  margin: 1.5rem auto;
+  margin: 1.2rem auto;
   padding: 0 1rem;
 }
 
@@ -82,7 +123,7 @@ header p {
   border-radius: 8px;
   overflow: hidden;
   position: relative;
-  touch-action: none; /* 와콤 펜 스크롤 방지 */
+  touch-action: none;
 }
 
 .panel-desc {
@@ -139,11 +180,6 @@ header p {
   color: #fca5a5;
 }
 
-.tool-btn.danger:hover {
-  background: #991b1b;
-}
-
-/* 와콤 펜 필압 표시기 */
 .pressure-info {
   margin-top: 0.8rem;
   font-size: 0.8rem;
@@ -168,7 +204,7 @@ header p {
   transition: width 0.05s ease-out;
 }
 
-/* 하단 튜토리얼 가이드 카드 */
+/* 하단 가이드 카드 */
 .guide-container {
   max-width: 1200px;
   margin: 0 auto 1.5rem;
@@ -192,6 +228,7 @@ header p {
 #step-desc {
   color: #d4d4d8;
   font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 .step-controls {
@@ -224,23 +261,6 @@ header p {
 #step-indicator {
   font-weight: bold;
   color: #a1a1aa;
-}
-
-/* 애드센스 영역 */
-.ad-container {
-  max-width: 1200px;
-  margin: 1.5rem auto;
-  padding: 0 1rem;
-}
-
-.ad-placeholder {
-  background: #18181b;
-  border: 1px dashed #3f3f46;
-  text-align: center;
-  padding: 1.5rem;
-  color: #71717a;
-  font-size: 0.85rem;
-  border-radius: 8px;
 }
 
 footer {
