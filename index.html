@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- SEO 메타 태그 -->
+  <title>웹 3D 모델링 따라하기 | Three.js 튜토리얼</title>
+  <meta name="description" content="웹 브라우저에서 직접 3D 모델링을 따라 해보고 배우는 인터랙티브 웹 튜토리얼입니다." />
+  <meta name="keywords" content="3D 모델링, Three.js, 웹 3D, HTML5, 자바스크립트, 3D 튜토리얼" />
+  <meta property="og:title" content="웹 3D 모델링 따라하기" />
+  <meta property="og:description" content="웹 브라우저에서 쉽고 재미있게 배우는 3D 모델링 프로젝트" />
+  <meta property="og:type" content="website" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 구글 애드센스 스크립트 (승인 후 client ID 넣기) -->
+  <!-- 
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+  -->
+</head>
+<body>
+  <header>
+    <h1>🎨 웹 3D 모델링 따라하기</h1>
+    <p>브라우저에서 3D 오브젝트를 조작하고 모델링 기초를 배워보세요!</p>
+  </header>
+
+  <main class="container">
+    <!-- 3D 캔버스 영역 -->
+    <section class="canvas-section">
+      <div id="canvas-container"></div>
+      <p class="instruction">💡 마우스 드래그로 회전, 스크롤로 확대/축소가 가능합니다.</p>
+    </section>
+
+    <!-- 설명 및 튜토리얼 영역 (애드센스 승인을 위해 텍스트 콘텐츠가 필요합니다) -->
+    <section class="content-section">
+      <h2>📌 Step 1. 3D 정육면체(Cube) 생성하기</h2>
+      <p>
+        Three.js를 사용하면 정점(Vertex)과 면(Face)을 직접 정의하지 않고도 간단한 기본 도형(Primitive)을 쉽게 만들 수 있습니다.
+      </p>
+      <ul>
+        <li><strong>MeshGeometry:</strong> 입체 도형의 형태와 크기를 정의합니다.</li>
+        <li><strong>MeshMaterial:</strong> 도형의 색상, 질감, 광택 등 표면 특성을 결정합니다.</li>
+        <li><strong>Mesh:</strong> Geometry와 Material을 결합하여 3D 공간에 배치되는 최종 객체입니다.</li>
+      </ul>
+
+      <!-- 상단/하단 광고 배치 영역 예시 -->
+      <div class="ad-placeholder">
+        <!-- 애드센스 광고 단위 코드가 들어갈 자리 -->
+        <p>[ 광고 영역 ]</p>
+      </div>
+
+      <h2>📌 Step 2. 회전 애니메이션 적용하기</h2>
+      <p>
+        `requestAnimationFrame` 루프를 사용하여 매 프레임마다 `mesh.rotation.x` 및 `mesh.rotation.y` 값을 조금씩 증가시키면 자연스럽게 회전하는 3D 모델을 완성할 수 있습니다.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 웹 3D 모델링 프로젝트. All rights reserved.</p>
+  </footer>
+
+  <!-- Three.js 및 OrbitControls CDN 불러오기 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- 메인 스크립트 -->
+  <script src="main.js"></script>
+</body>
+</html>
