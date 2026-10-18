@@ -1,103 +1,40 @@
-// --- 1. 상태 및 데이터 정의 ---
-const refContainer = document.getElementById('ref-canvas-container');
-const workContainer = document.getElementById('work-canvas-container');
-
-// 검색어별 맞춤 튜토리얼 데이터베이스
-const modelDatabase = {
-  "활 쏘는 장군": {
-    name: "활 쏘는 장군 모델",
-    steps: [
-      {
-        title: "📌 Step 1. 상체 및 활시위 기본 포지션 잡기",
-        desc: "<strong>[정밀 코칭]</strong> 펜을 중앙 하단에 대고, <strong>필압 0.4</strong>로 바깥쪽을 향해 <strong>0.5cm</strong> 정도 밀어내어 상체의 기본 볼륨을 만드세요.",
-        color: 0x3b82f6
-      },
-      {
-        title: "📌 Step 2. 활을 겨누는 팔 라인 늘리기",
-        desc: "<strong>[정밀 코칭]</strong> 왼쪽 측면에 펜을 대고, <strong>필압 0.7</strong>의 강도로 쭉 당겨 활을 뻗은 팔의 실루엣을 정확히 만드세요.",
-        color: 0xec4899
-      },
-      {
-        title: "📌 Step 3. 자세 다듬기 및 세부 디테일 완성",
-        desc: "<strong>[정밀 코칭]</strong> 전체적인 균형을 확인하며 펜을 가볍게(필압 0.2) 터치하여 표면의 각진 부분을 부드럽게 깎아 장군의 자세를 완성합니다.",
-        color: 0x10b981
-      }
-    ]
-  },
-  "기본": {
-    name: "기본 인체 모델",
-    steps: [
-      {
-        title: "📌 Step 1. 두상 형태 잡기",
-        desc: "<strong>[정밀 코칭]</strong> 상단 구 형태에 펜을 대고 필압 0.3으로 가볍게 밀어 두개골의 기초 윤곽을 잡으세요.",
-        color: 0x3b82f6
-      },
-      {
-        title: "📌 Step 2. 어깨와 몸통 확장",
-        desc: "<strong>[정밀 코칭]</strong> 중앙 부위에 펜을 누르고 필압 0.6으로 좌우를 넓혀 상체 볼륨을 만드세요.",
-        color: 0xec4899
-      }
-    ]
-  }
+// --- 1. 모의 이미지 데이터베이스 (검색어별 팝업 목록) ---
+const mockImageDatabase = {
+  "활 쏘는 장군": [
+    { name: "궁수 전사 포즈 1", url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&auto=format&fit=crop&q=80" },
+    { name: "활 시위 당기는 실루엣", url: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop&q=80" },
+    { name: "중세 장군 캐릭터", url: "https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop&q=80" }
+  ],
+  "전사": [
+    { name: "갑옷 입은 전사", url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80" },
+    { name: "검투사 스타일", url: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=400&auto=format&fit=crop&q=80" }
+  ],
+  "로봇": [
+    { name: "메카닉 안드로이드", url: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&auto=format&fit=crop&q=80" },
+    { name: "사이버네틱 3D", url: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=400&auto=format&fit=crop&q=80" }
+  ]
 };
 
-let currentSearchKey = "활 쏘는 장군";
-let currentStep = 0;
+// 검색어별 상세 튜토리얼 스텝 데이터 (최종 완성까지 쭉 나열)
+const tutorialStepsData = {
+  "활 쏘는 장군": [
+    { title: "Step 1. 상체 기본 볼륨 잡기", desc: "중앙에 펜을 대고 필압 0.4로 밀어내어 기본 기둥을 만드세요.", color: 0x3b82f6 },
+    { title: "Step 2. 어깨 및 팔 확장", desc: "좌우 측면에 필압 0.6을 주어 팔 뻗는 기초 실루엣을 확장하세요.", color: 0xec4899 },
+    { title: "Step 3. 활 시위 방향 각도 조절", desc: "왼쪽 부위에 필압 0.8을 주어 활을 쥔 손목 각도를 정확히 빼냅니다.", color: 0xf59e0b },
+    { title: "Step 4. 표면 스무딩 및 디테일 완성", desc: "전체적으로 필압 0.2로 부드럽게 쓸어내려 최종 장군 모델을 완성합니다.", color: 0x10b981 }
+  ],
+  "기본": [
+    { title: "Step 1. 기본 구형 윤곽 잡기", desc: "상단 구에 펜을 대고 필압 0.3으로 밀어 두개골을 만드세요.", color: 0x3b82f6 },
+    { title: "Step 2. 목과 턱선 다듬기", desc: "하단에 필압 0.5를 주어 턱 라인을 세밀하게 깎아냅니다.", color: 0x10b981 }
+  ]
+};
+
+let currentKey = "활 쏘는 장군";
+let currentStepIdx = 0;
 let activeMode = 'deform';
 
-// --- 2. 레퍼런스 뷰어 (왼쪽) ---
-const refScene = new THREE.Scene();
-refScene.background = new THREE.Color(0x09090b);
-
-const refCamera = new THREE.PerspectiveCamera(50, refContainer.clientWidth / refContainer.clientHeight, 0.1, 1000);
-refCamera.position.set(0, 1.5, 4);
-
-const refRenderer = new THREE.WebGLRenderer({ antialias: true });
-refRenderer.setSize(refContainer.clientWidth, refContainer.clientHeight);
-refRenderer.setPixelRatio(window.devicePixelRatio);
-refContainer.appendChild(refRenderer.domElement);
-
-refScene.add(new THREE.AmbientLight(0xffffff, 0.7));
-const refLight = new THREE.DirectionalLight(0xffffff, 0.8);
-refLight.position.set(3, 5, 4);
-refScene.add(refLight);
-
-const refControls = new THREE.OrbitControls(refCamera, refRenderer.domElement);
-refControls.enableDamping = true;
-
-let currentRefMesh = null;
-
-function loadReferenceModel(keyword) {
-  if (currentRefMesh) refScene.remove(currentRefMesh);
-
-  const group = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4 });
-
-  if (keyword.includes("활") || keyword.includes("장군") || keyword.includes("전사")) {
-    // 활 쏘는 장군 형태 모형 가상 생성
-    const body = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.4, 0.7), mat);
-    body.position.y = 0.1;
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.45, 32, 32), mat);
-    head.position.y = 1.0;
-    const bowArm = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 1.3, 16), mat);
-    bowArm.position.set(-0.7, 0.2, 0.2);
-    bowArm.rotation.z = 0.5;
-
-    group.add(body, head, bowArm);
-  } else {
-    // 기본 인체
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.6, 32, 32), mat);
-    head.position.y = 0.8;
-    const chest = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.2, 0.7), mat);
-    chest.position.y = -0.2;
-    group.add(head, chest);
-  }
-
-  currentRefMesh = group;
-  refScene.add(currentRefMesh);
-}
-
-// --- 3. 작업 공간 뷰어 (오른쪽) ---
+// --- 2. 3D 작업 캔버스 세팅 ---
+const workContainer = document.getElementById('work-canvas-container');
 const workScene = new THREE.Scene();
 workScene.background = new THREE.Color(0x09090b);
 
@@ -122,7 +59,85 @@ let workMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.3 }
 let workMesh = new THREE.Mesh(workGeo, workMat);
 workScene.add(workMesh);
 
-// --- 4. 펜 필압 및 변형 로직 ---
+// --- 3. 팝업창 및 이미지 검색 제어 ---
+const modal = document.getElementById('image-modal');
+const popupBtn = document.getElementById('search-popup-btn');
+const closeBtn = document.getElementById('modal-close-btn');
+const imageGrid = document.getElementById('image-grid');
+
+popupBtn.addEventListener('click', () => {
+  const keyword = document.getElementById('search-input').value.trim();
+  openImageModal(keyword);
+});
+
+closeBtn.addEventListener('click', () => {
+  modal.style.display = 'none';
+});
+
+function openImageModal(keyword) {
+  imageGrid.innerHTML = '';
+  let list = mockImageDatabase[keyword] || mockImageDatabase["활 쏘는 장군"];
+
+  list.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'image-card';
+    card.innerHTML = `<img src="${item.url}" alt="${item.name}"><span>${item.name}</span>`;
+    card.addEventListener('click', () => {
+      selectReferenceImage(item.url, keyword);
+      modal.style.display = 'none';
+    });
+    imageGrid.appendChild(card);
+  });
+
+  modal.style.display = 'flex';
+}
+
+function selectReferenceImage(url, keyword) {
+  const imgElem = document.getElementById('selected-ref-img');
+  const canvasElem = document.getElementById('ref-canvas-container');
+  
+  imgElem.src = url;
+  imgElem.style.display = 'block';
+  canvasElem.style.display = 'none';
+
+  currentKey = tutorialStepsData[keyword] ? keyword : "활 쏘는 장군";
+  currentStepIdx = 0;
+  updateTutorialUI();
+}
+
+// --- 4. 튜토리얼 스텝 및 전체 리스트 렌더링 ---
+function updateTutorialUI() {
+  const steps = tutorialStepsData[currentKey] || tutorialStepsData["활 쏘는 장군"];
+  const stepData = steps[currentStepIdx];
+
+  workMat.color.setHex(stepData.color);
+
+  document.getElementById('step-title').innerText = stepData.title;
+  document.getElementById('step-desc').innerHTML = `<strong>[정밀 가이드]</strong> ${stepData.desc}`;
+  document.getElementById('step-indicator').innerText = `${currentStepIdx + 1} / ${steps.length} 단계`;
+
+  document.getElementById('prev-btn').disabled = (currentStepIdx === 0);
+  document.getElementById('next-btn').disabled = (currentStepIdx === steps.length - 1);
+
+  renderStepList(steps);
+}
+
+function renderStepList(steps) {
+  const container = document.getElementById('step-list-items');
+  container.innerHTML = '';
+  steps.forEach((st, idx) => {
+    const pill = document.createElement('div');
+    pill.className = `step-pill ${idx === currentStepIdx ? 'active' : ''}`;
+    pill.innerText = `Step ${idx + 1}`;
+    pill.addEventListener('click', () => {
+      currentStepIdx = idx;
+      updateTutorialUI();
+    });
+    container.appendChild(pill);
+  });
+}
+
+// --- 5. 펜 필압 및 스컬프팅 변형 로직 ---
 const raycaster = new THREE.Raycaster();
 const mouseVec = new THREE.Vector2();
 let isPenDown = false;
@@ -194,52 +209,7 @@ function updatePressureUI(val) {
   document.getElementById('pressure-bar').style.width = `${val * 100}%`;
 }
 
-// --- 5. 검색 및 튜토리얼 시스템 연동 ---
-function applySearchKeyword(keyword) {
-  let matchedKey = "기본";
-  for (let key in modelDatabase) {
-    if (keyword.includes(key) || key.includes(keyword)) {
-      matchedKey = key;
-      break;
-    }
-  }
-
-  currentSearchKey = matchedKey;
-  currentStep = 0;
-
-  loadReferenceModel(currentSearchKey);
-  updateStepUI();
-
-  document.getElementById('ref-title').innerText = `🎯 목표 모델: ${modelDatabase[currentSearchKey].name}`;
-}
-
-function updateStepUI() {
-  const steps = modelDatabase[currentSearchKey].steps;
-  const data = steps[currentStep];
-
-  workMat.color.setHex(data.color);
-
-  document.getElementById('step-title').innerText = data.title;
-  document.getElementById('step-desc').innerHTML = data.desc;
-  document.getElementById('step-indicator').innerText = `${currentStep + 1} / ${steps.length} 단계`;
-
-  document.getElementById('prev-btn').disabled = (currentStep === 0);
-  document.getElementById('next-btn').disabled = (currentStep === steps.length - 1);
-}
-
-// 이벤트 리스너 연결
-document.getElementById('search-btn').addEventListener('click', () => {
-  const val = document.getElementById('search-input').value.trim();
-  if (val) applySearchKeyword(val);
-});
-
-document.getElementById('search-input').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    const val = document.getElementById('search-input').value.trim();
-    if (val) applySearchKeyword(val);
-  }
-});
-
+// 버튼 이벤트
 const modeDeformBtn = document.getElementById('mode-deform');
 const modeRotateBtn = document.getElementById('mode-rotate');
 
@@ -265,42 +235,33 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 });
 
 document.getElementById('next-btn').addEventListener('click', () => {
-  const steps = modelDatabase[currentSearchKey].steps;
-  if (currentStep < steps.length - 1) {
-    currentStep++;
-    updateStepUI();
+  const steps = tutorialStepsData[currentKey] || tutorialStepsData["활 쏘는 장군"];
+  if (currentStepIdx < steps.length - 1) {
+    currentStepIdx++;
+    updateTutorialUI();
   }
 });
 
 document.getElementById('prev-btn').addEventListener('click', () => {
-  if (currentStep > 0) {
-    currentStep--;
-    updateStepUI();
+  if (currentStepIdx > 0) {
+    currentStepIdx--;
+    updateTutorialUI();
   }
 });
 
-// 초기 실행
+// 초기 실행 (첫 번째 이미지 기본 선택)
 workControls.enabled = false;
-applySearchKeyword("활 쏘는 장군");
+selectReferenceImage(mockImageDatabase["활 쏘는 장군"][0].url, "활 쏘는 장군");
 
 // --- 6. 애니메이션 루프 ---
 function animate() {
   requestAnimationFrame(animate);
-  if (currentRefMesh) currentRefMesh.rotation.y += 0.003;
-  refControls.update();
   workControls.update();
-  refRenderer.render(refScene, refCamera);
   workRenderer.render(workScene, workCamera);
 }
 animate();
 
 window.addEventListener('resize', () => {
-  const refW = refContainer.clientWidth;
-  const refH = refContainer.clientHeight;
-  refCamera.aspect = refW / refH;
-  refCamera.updateProjectionMatrix();
-  refRenderer.setSize(refW, refH);
-
   const workW = workContainer.clientWidth;
   const workH = workContainer.clientHeight;
   workCamera.aspect = workW / workH;
